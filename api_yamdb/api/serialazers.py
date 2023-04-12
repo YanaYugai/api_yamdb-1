@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from api_yamdb.reviews.models import Title, Genre, Category
+from reviews.models import Title, Genre, Category
 
 
 class GenreSerializer(serializers.ModelSerializer):

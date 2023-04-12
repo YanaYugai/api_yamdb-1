@@ -5,10 +5,11 @@ from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 
 from .serialazers import TitleReadSerializer, TitleWriteSerializer, CategorySerializer, GenreSerializer
-from api_yamdb.reviews.models import Title, Genre, Category
+from reviews.models import Title, Genre, Category
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    """Вьюсет для категорий."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     # permission_classes =
@@ -17,6 +18,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(viewsets.ModelViewSet):
+    """Вьюсет для жанров."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     # permission_classes =
@@ -25,6 +27,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """Вьюсет для произведений."""
     queryset = Title.objects.all()
     serializer_class = GenreSerializer
     # permission_classes =

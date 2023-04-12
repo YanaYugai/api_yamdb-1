@@ -1,9 +1,10 @@
 from django_filters import FilterSet, CharFilter
 
-from api_yamdb.reviews.models import Title
+from reviews.models import Title
 
 
 class TitleFilter(FilterSet):
+    """Фильтр для произведений."""
     category = CharFilter(field_name='category',
                           lookup_expr='icontains')
     genre = CharFilter(field_name='genre',

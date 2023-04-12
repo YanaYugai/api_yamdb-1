@@ -8,9 +8,9 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    """Модель категории произведения"""
+    """Модель категории произведения."""
     name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True, max_length=50)
+    slug = models.SlugField(max_length=50, )
 
     class Meta:
         verbose_name = 'Категория'
@@ -22,16 +22,16 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    """Модель жанра произведения"""
+    """Модель жанра произведения."""
     name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True, max_length=50)
+    slug = models.SlugField(max_length=50)
 
     def __str__(self):
         return self.name
 
 
 class Title(models.Model):
-    """Модель жанра произведения"""
+    """Модель жанра произведения."""
     name = models.CharField(max_length=256)
     description = models.TextField(null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True,
