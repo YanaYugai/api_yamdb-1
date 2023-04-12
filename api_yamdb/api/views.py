@@ -38,3 +38,9 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ('create', 'partial_update',):
             return TitleWriteSerializer
         return TitleReadSerializer
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    pass
+
+class CommentViewSet(viewsets.ModelViewSet):
+    pass

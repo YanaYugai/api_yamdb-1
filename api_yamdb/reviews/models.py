@@ -52,5 +52,33 @@ class Title(models.Model):
     def __str__(self):
         return self.name
 
+class Review(models.Model):
+    """Модель отзывов."""
+    title = models.ForeignKey(Title, on_delete=models.CASCADE, related_name='reviews')
+    text = models.TextField()
+    author = models.ForeignKey(User,  on_delete=models.CASCADE, related_name='reviews')
+    pub_date = models.DateTimeField(auto_now_add=True)
+    score = models.IntegerField(validators=(MinValueValidator(1), MaxValueValidator(10)))
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
+    def __str__(self):
+        return self.text
+    
 
 
+class Comment(models.Model):
+    """Модель комментариев."""
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    pub_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+    
+    def __str__(self):
+        return self.text
