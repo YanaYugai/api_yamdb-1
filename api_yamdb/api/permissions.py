@@ -24,8 +24,8 @@ class IsAdminOrReadOnly(BasePermission):
 
     def has_permission(self, request: Request, view: None) -> bool:
         del view
-        return (
-            request.method in SAFE_METHODS or request.user.role == User.ADMIN
+        return request.method in SAFE_METHODS or (
+            request.user.role == User.ADMIN or request.user.is_superuser
         )
 
     def has_object_permission(self, request: Request, view: None, obj) -> bool:

@@ -11,7 +11,8 @@ from users.models import User
 def validate_serializer(data: Any):
     """Функция для валидации полей сериализаторов."""
     if User.objects.filter(
-        email=data.get('email'), username=data.get('username'),
+        email=data.get('email'),
+        username=data.get('username'),
     ).exists():
         return data
     if (

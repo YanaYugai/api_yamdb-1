@@ -28,16 +28,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 @api_view(["GET", "PATCH"])
-@permission_classes(
-    [
-        IsAuthenticated,
-    ],
-)
+@permission_classes([IsAuthenticated])
 def get_me(request):
     """Сериализатор профиля пользователя."""
     if request.method == "PATCH":
         serializer = ProfileSerializer(
-            request.user, data=request.data, partial=True,
+            request.user,
+            data=request.data,
+            partial=True,
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
