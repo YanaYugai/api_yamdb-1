@@ -10,7 +10,8 @@ from .mixins import NewViewSet
 from .permissions import IsAdminOrReadOnly, \
     IsUserAdminAuthorModeratorOrReadOnly
 
-from .serialazers import TitleReadSerializer, TitleWriteSerializer, CategorySerializer, GenreSerializer, ReviewSerializer, CommentSerializer
+from .serialazers import TitleReadSerializer, TitleWriteSerializer, \
+    CategorySerializer, GenreSerializer, ReviewSerializer, CommentSerializer
 from reviews.models import Title, Genre, Category, Review
 
 
@@ -44,7 +45,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
-        if self.action in ('create', 'partial_update',):
+        if self.action in ('create', 'partial_update'):
             return TitleWriteSerializer
         return TitleReadSerializer
 
@@ -79,4 +80,3 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)
-
