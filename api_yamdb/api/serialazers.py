@@ -25,40 +25,29 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class TitleReadSerializer(serializers.ModelSerializer):
     """Сериализатор для просмотра произведений."""
-    category = CategorySerializer(
-        read_only=True
-    )
-    genre = GenreSerializer(
-        many=True,
-        read_only=True,
-    )
-    rating = IntegerField(
-        read_only=True
-    )
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(many=True, read_only=True)
+    rating = IntegerField(read_only=True)
 
     class Meta:
         model = Title
         fields = ('id', 'name', 'description', 'year',
-                  'rating', 'genre', 'category',)
+                  'rating', 'genre', 'category')
         read_only_fields = ('rating',)
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления произведений."""
-    category = SlugRelatedField(
-        slug_field='slug',
-        queryset=Category.objects.all(),
-        many=False,
-    )
-    genre = SlugRelatedField(
-        slug_field='slug',
-        queryset=Genre.objects.all(),
-        many=True
-    )
+    category = SlugRelatedField(slug_field='slug',
+                                queryset=Category.objects.all(),
+                                many=False)
+    genre = SlugRelatedField(slug_field='slug',
+                             queryset=Genre.objects.all(),
+                             many=True)
 
     class Meta:
         fields = ('id', 'name', 'description',
-                  'rating', 'year', 'genre', 'category',)
+                  'rating', 'year', 'genre', 'category')
         model = Title
         read_only_fields = ('rating',)
 
@@ -68,10 +57,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True,
     )
-    title = SlugRelatedField(
-        slug_field='name',
-        read_only=True
-    )
+    title = SlugRelatedField(slug_field='name',
+                             read_only=True)
 
     def validate(self, data):
         request = self.context['request']
@@ -82,7 +69,8 @@ class ReviewSerializer(serializers.ModelSerializer):
                 request.method == 'POST'
                 and Review.objects.filter(title=title, author=author).exists()
         ):
-            raise ValidationError('Вы можете оставить только 1 отзыв на одно и то же произведение!')
+            raise ValidationError('Вы можете оставить только '
+                                  '1 отзыв на одно и то же произведение!')
         return data
 
     class Meta:
@@ -95,10 +83,8 @@ class CommentSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True,
     )
-    review = SlugRelatedField(
-        slug_field='text',
-        read_only=True
-    )
+    review = SlugRelatedField(slug_field='text',
+                              read_only=True)
 
     class Meta:
         model = Comment
