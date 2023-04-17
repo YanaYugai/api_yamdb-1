@@ -69,12 +69,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
+        title = get_object_or_404(
+            Title,
+            id=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
-        rating = title.reviews.aggregate(Avg('score'))
-        title.rating = int(rating.get('score__avg'))
-        title.save()
 
 
 class CommentViewSet(viewsets.ModelViewSet):
