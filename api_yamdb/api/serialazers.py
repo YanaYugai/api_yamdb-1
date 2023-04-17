@@ -1,9 +1,9 @@
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.fields import IntegerField
 from rest_framework.relations import SlugRelatedField
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import AccessToken
@@ -30,6 +30,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class TitleReadSerializer(serializers.ModelSerializer):
     """Сериализатор для просмотра произведений."""
+
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(many=True, read_only=True)
     rating = serializers.IntegerField(read_only=True)
@@ -41,12 +42,13 @@ class TitleReadSerializer(serializers.ModelSerializer):
 
 class TitleWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления произведений."""
-    category = SlugRelatedField(slug_field='slug',
-                                queryset=Category.objects.all(),
-                                many=False)
-    genre = SlugRelatedField(slug_field='slug',
-                             queryset=Genre.objects.all(),
-                             many=True)
+
+    category = SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all(), many=False,
+    )
+    genre = SlugRelatedField(
+        slug_field='slug', queryset=Genre.objects.all(), many=True,
+    )
 
     class Meta:
         fields = '__all__'
@@ -58,8 +60,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True,
     )
-    title = SlugRelatedField(slug_field='name',
-                             read_only=True)
+    title = SlugRelatedField(slug_field='name', read_only=True)
 
     def validate(self, data):
         request = self.context['request']
@@ -67,11 +68,13 @@ class ReviewSerializer(serializers.ModelSerializer):
         title_id = self.context.get('view').kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
         if (
-                request.method == 'POST'
-                and Review.objects.filter(title=title, author=author).exists()
+            request.method == 'POST'
+            and Review.objects.filter(title=title, author=author).exists()
         ):
-            raise ValidationError('Вы можете оставить только '
-                                  '1 отзыв на одно и то же произведение!')
+            raise ValidationError(
+                'Вы можете оставить только '
+                '1 отзыв на одно и то же произведение!',
+            )
         return data
 
     class Meta:
@@ -84,28 +87,14 @@ class CommentSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True,
     )
-    review = SlugRelatedField(slug_field='text',
-                              read_only=True)
+    review = SlugRelatedField(slug_field='text', read_only=True)
 
     class Meta:
         model = Comment
         fields = '__all__'
 
 
-class CreationUserSerializer(serializers.ModelSerializer):
-    """Сериализатор с расширенным методом `create`."""
-
-    def create(self, validated_data):
-        try:
-            user, created = User.objects.get_or_create(**validated_data)
-        except IntegrityError:
-            raise serializers.ValidationError(
-                'Используйте другую почту или имя пользователя!',
-            )
-        return user
-
-
-class UserSerializer(CreationUserSerializer):
+class UserSerializer(serializers.ModelSerializer):
     """Сериализатор для модели `User`."""
 
     class Meta:
@@ -119,19 +108,38 @@ class UserSerializer(CreationUserSerializer):
             'role',
         ]
 
+    def create(self, validated_data):
+        try:
+            user, created = User.objects.get_or_create(**validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError(
+                'Используйте другую почту или имя пользователя!',
+            )
+        return user
 
-class CreationUserSerializer(CreationUserSerializer):
+
+class CreationUserSerializer(serializers.Serializer):
     """Сериализатор для модели `User` для создания пользователя."""
 
-    class Meta:
-        model = User
-        fields = ("username", "email")
+    email = serializers.EmailField(max_length=254)
+    username = serializers.CharField(
+        max_length=150, validators=[UnicodeUsernameValidator()],
+    )
 
     def validate_username(self, username):
         """Валидация поля `username`."""
         if username == "me":
             raise serializers.ValidationError('Имя `me` нельзя использовать!')
         return username
+
+    def create(self, validated_data):
+        try:
+            user, created = User.objects.get_or_create(**validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError(
+                'Используйте другую почту или имя пользователя!',
+            )
+        return user
 
 
 class TokenSerializer(TokenObtainSerializer):
