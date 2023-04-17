@@ -1,18 +1,28 @@
+import uuid
+
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.pagination import LimitOffsetPagination
-from .filters import TitleFilter
-
-from rest_framework import viewsets
+from rest_framework import generics, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from .mixins import NewViewSet
-from .permissions import IsAdminOrReadOnly, \
-    IsUserAdminAuthorModeratorOrReadOnly
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-from .serialazers import TitleReadSerializer, TitleWriteSerializer, \
-    CategorySerializer, GenreSerializer, ReviewSerializer, CommentSerializer
-from reviews.models import Title, Genre, Category, Review
+from reviews.models import Category, Genre, Review, Title
+from users.models import User
+from .filters import TitleFilter
+from .mixins import NewViewSet
+from .permissions import (IsAdmin, IsAdminOrReadOnly,
+                          IsUserAdminAuthorModeratorOrReadOnly)
+from .serialazers import (CategorySerializer, CommentSerializer,
+                          CreationUserSerializer, GenreSerializer,
+                          ProfileSerializer, ReviewSerializer,
+                          TitleReadSerializer, TitleWriteSerializer,
+                          UserSerializer)
 
 
 class CategoryViewSet(NewViewSet):
@@ -80,3 +90,64 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """Вьюсет для модели `User`."""
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [
+        IsAdmin,
+    ]
+    filter_backends = (SearchFilter,)
+    search_fields = ('username',)
+    lookup_field = 'username'
+    http_method_names = ['get', 'post', 'delete', 'patch']
+
+    def get_serializer_class(self):
+        if self.action == "me":
+            return ProfileSerializer
+        return self.serializer_class
+
+    @action(
+        detail=False,
+        methods=['GET', 'PATCH'],
+        permission_classes=[IsAuthenticated],
+    )
+    def me(self, request, pk=None):
+        """Сериализатор профиля пользователя."""
+        if request.method == "PATCH":
+            serializer = self.get_serializer(
+                request.user,
+                data=request.data,
+                partial=True,
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+
+
+class SignUpAPIView(generics.CreateAPIView):
+    """Вью-функция для создания пользователя."""
+
+    serializer_class = CreationUserSerializer
+
+    def post(self, request):
+        """Cохранение нового/существующего экземпляра объекта."""
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        code = uuid.uuid4()
+        user = serializer.save()
+        user.confirmation_code = code
+        user.save()
+        send_mail(
+            'Confirmation code',
+            f'Your code {code}',
+            settings.MY_EMAIL,
+            [user.email],
+            fail_silently=False,
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)

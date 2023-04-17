@@ -115,5 +115,5 @@ MY_EMAIL = 'yanayugai6@gmail.com'
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=365),
     "AUTH_HEADER_TYPES": ("Bearer",),
-    "TOKEN_OBTAIN_SERIALIZER": "users.serializers.TokenSerializer",
+    "TOKEN_OBTAIN_SERIALIZER": "api.serialazers.TokenSerializer",
 }
