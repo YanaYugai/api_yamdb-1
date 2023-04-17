@@ -32,13 +32,11 @@ class TitleReadSerializer(serializers.ModelSerializer):
     """Сериализатор для просмотра произведений."""
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(many=True, read_only=True)
-    rating = IntegerField(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'description', 'year',
-                  'rating', 'genre', 'category')
-        read_only_fields = ('rating',)
+        fields = '__all__'
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
@@ -51,10 +49,8 @@ class TitleWriteSerializer(serializers.ModelSerializer):
                              many=True)
 
     class Meta:
-        fields = ('id', 'name', 'description',
-                  'rating', 'year', 'genre', 'category')
+        fields = '__all__'
         model = Title
-        read_only_fields = ('rating',)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

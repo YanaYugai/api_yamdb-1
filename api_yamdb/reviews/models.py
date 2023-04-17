@@ -4,6 +4,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.db.models import UniqueConstraint
+from .validators import validate_year
 
 User = get_user_model()
 
@@ -37,17 +38,13 @@ class Title(models.Model):
     description = models.TextField(null=True, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True,
                                        verbose_name='Год выпуска',
-                                       validators=[MaxValueValidator
-                                                   (date.today().year)])
+                                       validators=(validate_year,))
     genre = models.ManyToManyField(Genre, related_name='titles',
                                    verbose_name='Жанр')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,
                                  related_name='titles',
                                  verbose_name='Категория',
                                  null=True, blank=True)
-    rating = models.IntegerField(default=None,
-                                 null=True,
-                                 verbose_name='Оценка')
 
     class Meta:
         ordering = ('-year',)
