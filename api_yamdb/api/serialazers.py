@@ -109,13 +109,7 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        try:
-            user, created = User.objects.get_or_create(**validated_data)
-        except IntegrityError:
-            raise serializers.ValidationError(
-                'Используйте другую почту или имя пользователя!',
-            )
-        return user
+        return create_or_get(validated_data)
 
 
 class CreationUserSerializer(serializers.Serializer):
@@ -127,19 +121,12 @@ class CreationUserSerializer(serializers.Serializer):
     )
 
     def validate_username(self, username):
-        """Валидация поля `username`."""
         if username == "me":
             raise serializers.ValidationError('Имя `me` нельзя использовать!')
         return username
 
     def create(self, validated_data):
-        try:
-            user, created = User.objects.get_or_create(**validated_data)
-        except IntegrityError:
-            raise serializers.ValidationError(
-                'Используйте другую почту или имя пользователя!',
-            )
-        return user
+        return create_or_get(validated_data)
 
 
 class TokenSerializer(TokenObtainSerializer):
@@ -153,7 +140,6 @@ class TokenSerializer(TokenObtainSerializer):
         del self.fields["password"]
 
     def validate(self, data):
-        """Валидация данных."""
         try:
             user = User.objects.get(username=data["username"])
         except User.DoesNotExist:
@@ -179,3 +165,14 @@ class ProfileSerializer(serializers.ModelSerializer):
             "role",
         )
         read_only_fields = ("role",)
+
+
+def create_or_get(validated_data):
+    """Функция для создания или получения пользователя."""
+    try:
+        user, created = User.objects.get_or_create(**validated_data)
+    except IntegrityError:
+        raise serializers.ValidationError(
+            'Используйте другую почту или имя пользователя!',
+        )
+    return user
