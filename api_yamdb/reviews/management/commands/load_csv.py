@@ -23,7 +23,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for model, csv in MODEL_CSV.items():
-            # model.objects.all().delete() Если нужно все очистить, включая удаление superuser
+            # model.objects.all().delete() Если нужно
+            # все очистить, включая удаление superuser
             with open(f'{settings.BASE_DIR}/static/data/{csv}',
                       'r', encoding='utf-8') as csv_file:
                 reader = DictReader(csv_file)

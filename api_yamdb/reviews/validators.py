@@ -5,6 +5,4 @@ from django.utils import timezone
 def validate_year(value):
     now = timezone.now().year
     if value > now:
-        raise ValidationError(
-            f'Год {value} больше максимального {now}!'
-        )
+        raise ValidationError(f'Год {value} больше максимального {now}!')
