@@ -6,13 +6,13 @@ from reviews.models import Category, Genre, Title, Review, Comment
 from users.models import User
 
 MODEL_CSV = {
-    User: 'static/data/users.csv',
-    Category: 'static/data/category.csv',
-    Genre: 'static/data/genre.csv',
-    Title: 'static/data/titles.csv',
-    Title.genre.through: 'static/data/genre_title.csv',
-    Review: 'static/data/review.csv',
-    Comment: 'static/data/comments.csv',
+    'static/data/users.csv': User,
+    'static/data/category.csv': Category,
+    'static/data/genre.csv': Genre,
+    'static/data/titles.csv': Title,
+    'static/data/genre_title.csv': Title.genre.through,
+    'static/data/review.csv': Review,
+    'static/data/comments.csv': Comment,
 }
 
 
@@ -22,7 +22,7 @@ class Command(BaseCommand):
     help = 'Import .csv files'
 
     def handle(self, *args, **options):
-        for model, csv in MODEL_CSV.items():
+        for csv, model in MODEL_CSV.items():
             # model.objects.all().delete() Если нужно
             # все очистить, включая удаление superuser
             with open(f'{settings.BASE_DIR}/static/data/{csv}',
