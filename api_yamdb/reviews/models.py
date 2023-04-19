@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -62,7 +62,7 @@ class Review(models.Model):
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='reviews')
-    pub_date = models.DateTimeField(auto_now_add=True)
+    pub_date = models.DateTimeField(default=datetime.now)
     score = models.IntegerField(validators=(MinValueValidator(1),
                                             MaxValueValidator(10)))
 
@@ -83,7 +83,7 @@ class Comment(models.Model):
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='comments')
-    pub_date = models.DateTimeField(auto_now_add=True)
+    pub_date = models.DateTimeField(default=datetime.now)
 
     class Meta:
         verbose_name = 'Комментарий'
