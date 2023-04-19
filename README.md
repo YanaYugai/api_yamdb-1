@@ -73,18 +73,7 @@ python3 manage.py migrate
 
 Установить переменную окружения:
 
-1. Сгенерируйте новый секретный ключ:
-
-  ```bash
-  python manage.py shell
-  ```
-
-  ```python
-  from django.core.management.utils import get_random_secret_key
-  print(get_random_secret_key())
-  ```
-
-2. В директории проекта api_yamdb/api_yamdb создайте файл .env и запишите в него
+В директории проекта api_yamdb/api_yamdb создайте файл .env и запишите в него
 полученную переменную в формате ключ=значение:
 
   ```python
