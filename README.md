@@ -73,19 +73,8 @@ python3 manage.py migrate
 
 Установить переменную окружения:
 
-1. Сгенерируйте новый секретный ключ:
-
-  ```bash
-  python manage.py shell
-  ```
-
-  ```python
-  from django.core.management.utils import get_random_secret_key
-  print(get_random_secret_key())
-  ```
-
-2. В директории проекта api_yamdb/api_yamdb создайте файл .env и запишите в него
-полученную переменную в формате ключ=значение:
+В директории проекта api_yamdb/api_yamdb создайте файл .env и запишите в него
+переменную SECRET_KEY в формате ключ=значение, например:
 
   ```python
   SECRET_KEY=abcdefgh123456789_etc
@@ -103,16 +92,6 @@ python3 manage.py runserver
 Когда вы запустите проект, по адресу  http://127.0.0.1:8000/redoc/ будет доступна документация для API YaMDb. 
 В документации описано, как должен работать API. Документация представлена в формате Redoc.
 
-## Заполнение базы данных контентом из приложенных csv-файлов
-
-В директории /api_yamdb/static/data
-подготовлены несколько файлов для тестирования проекта в формате csv с контентом для ресурсов Users, Titles, Categories, Genres, Reviews и Comments. 
-
-Чтобы заполнить базу данных, выполните команду:
-
-```
-python3 manage.py load_csv
-```
 
 ## Примеры запросов
 
@@ -175,3 +154,5 @@ python3 manage.py load_csv
   }
 }
 ```
+
+
